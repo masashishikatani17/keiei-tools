@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1人採用したら、売上はいくら必要？｜経営tools</title>
+  <meta name="description" content="社員を1人採用したときの年間の会社負担と、現在の利益水準を維持するために会社全体で必要になる追加売上を計算する無料シミュレーターです。登録不要・入力内容は保存されません。">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">1人採用したら、売上はいくら必要？</h1>
+    <p class="page-lead">採用にかかるのは給与だけではありません。賞与、会社負担の社会保険料、その他の費用も含めた年間の会社負担と、その負担を回収するために必要な追加売上を計算します。</p>
+
+    <div class="note-box">
+      <p>このツールが計算するのは「その社員本人が売り上げるべき金額」ではありません。採用によって増える費用を回収するために、<strong>会社全体として必要になる追加売上</strong>の目安です。事務職や管理部門など、直接売上を作らない人材の採用検討にもお使いいただけます。</p>
+    </div>
+
+    <form id="hiring-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="monthly-salary">月給（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="monthly-salary-desc">毎月支払う給与</p>
+        <input type="number" id="monthly-salary" inputmode="numeric" min="0" step="1" placeholder="例）300000" aria-describedby="monthly-salary-desc monthly-salary-error">
+        <p class="field-aid" id="monthly-salary-aid"></p>
+        <p class="field-error" id="monthly-salary-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="annual-bonus">年間賞与（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="annual-bonus-desc">1年間に支払う賞与の合計。ない場合は0</p>
+        <input type="number" id="annual-bonus" inputmode="numeric" min="0" step="1" placeholder="例）600000" aria-describedby="annual-bonus-desc annual-bonus-error">
+        <p class="field-aid" id="annual-bonus-aid"></p>
+        <p class="field-error" id="annual-bonus-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="annual-social-cost">会社負担の社会保険等（円/年）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="annual-social-cost-desc">会社負担の社会保険料・労働保険料などの年間見込み</p>
+        <input type="number" id="annual-social-cost" inputmode="numeric" min="0" step="1" placeholder="例）700000" aria-describedby="annual-social-cost-desc annual-social-cost-error">
+        <p class="field-aid" id="annual-social-cost-aid"></p>
+        <p class="field-error" id="annual-social-cost-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="annual-other-cost">その他の年間費用（円/年）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="annual-other-cost-desc">通勤費、福利厚生、備品、ソフト利用料など。ない場合は0</p>
+        <input type="number" id="annual-other-cost" inputmode="numeric" min="0" step="1" placeholder="例）300000" aria-describedby="annual-other-cost-desc annual-other-cost-error">
+        <p class="field-aid" id="annual-other-cost-aid"></p>
+        <p class="field-error" id="annual-other-cost-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="initial-hiring-cost">採用時だけかかる費用（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="initial-hiring-cost-desc">人材紹介料、求人広告、PC購入など、初年度のみ発生する費用。ない場合は0</p>
+        <input type="number" id="initial-hiring-cost" inputmode="numeric" min="0" step="1" placeholder="例）500000" aria-describedby="initial-hiring-cost-desc initial-hiring-cost-error">
+        <p class="field-aid" id="initial-hiring-cost-aid"></p>
+        <p class="field-error" id="initial-hiring-cost-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="gross-margin">粗利益率（％）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="gross-margin-desc">売上に対して粗利益（売上高 − 売上原価）が何％残るか</p>
+        <input type="number" id="gross-margin" inputmode="decimal" min="0" max="100" step="0.1" placeholder="例）30" aria-describedby="gross-margin-desc gross-margin-error">
+        <p class="field-error" id="gross-margin-error" hidden></p>
+
+        <details class="margin-helper">
+          <summary>粗利益率がわからない方</summary>
+          <div class="margin-helper-body">
+            <p class="field-desc">直近1年間など、わかる範囲の「売上高」と「売上原価」を入力してください。粗利益率 ＝（売上高 − 売上原価）÷ 売上高 × 100 で計算し、上の入力欄に反映します。</p>
+            <div class="field">
+              <label for="helper-sales">売上高（円）</label>
+              <input type="number" id="helper-sales" inputmode="numeric" min="0" step="1" placeholder="例）100000000" aria-describedby="helper-sales-error">
+              <p class="field-aid" id="helper-sales-aid"></p>
+              <p class="field-error" id="helper-sales-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="helper-cost">売上原価（円）</label>
+              <input type="number" id="helper-cost" inputmode="numeric" min="0" step="1" placeholder="例）70000000" aria-describedby="helper-cost-error">
+              <p class="field-aid" id="helper-cost-aid"></p>
+              <p class="field-error" id="helper-cost-error" hidden></p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="apply-margin">粗利益率を計算して反映</button>
+            <p class="field-error" id="margin-helper-error" hidden></p>
+            <p class="helper-result" id="margin-helper-result" hidden></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="field">
+        <label for="expected-monthly-sales">この採用で期待する追加売上（円/月）<span class="badge badge-optional">任意</span></label>
+        <p class="field-desc" id="expected-monthly-sales-desc">採用によって会社全体で増えると見込む月間売上。未入力の場合、この項目の試算は表示されません</p>
+        <input type="number" id="expected-monthly-sales" inputmode="numeric" min="0" step="1" placeholder="例）1000000" aria-describedby="expected-monthly-sales-desc expected-monthly-sales-error">
+        <p class="field-aid" id="expected-monthly-sales-aid"></p>
+        <p class="field-error" id="expected-monthly-sales-error" hidden></p>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>必要な追加売上が採用コストそのものより大きくなるのは、売上を増やすときには仕入や外注費などの売上原価も一緒に増えるためです。例えば粗利益率30％の会社では、売上が100万円増えても会社に残る粗利益は約30万円です。そのため、年間570万円の採用コストを回収するには570万円の売上増加では足りず、570万円 ÷ 30％ ＝ 約1,900万円の売上増加が必要になります。</p>
+      <p>また、ここで表示される必要売上は、採用した社員本人が1人で稼がなければならない売上ではありません。採用によって増える費用を、会社全体の売上増加でまかなうと考えた場合の目安です。営業職はもちろん、事務職や管理部門など直接売上を作らない職種の採用を考えるときにも、同じ見方で利用できます。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の人件費、社会保険料、税金、採用効果などを保証するものではありません。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/hiring.js" defer></script>
+</body>
+</html>
