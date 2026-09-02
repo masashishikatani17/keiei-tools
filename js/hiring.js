@@ -3,124 +3,11 @@
 (function () {
   'use strict';
 
-  function $(id) {
-    return document.getElementById(id);
-  }
-
-  /* ---------- 数値フォーマット ---------- */
-
-  function formatComma(value) {
-    return Math.round(value).toLocaleString('ja-JP');
-  }
-
-  /* 円単位の金額を1万円単位に四捨五入して「約○万円」で表示する。
-     1万円未満は円のまま、1億円以上は「約○億○万円」で表示する。 */
-  function formatApproxYen(yen) {
-    if (typeof yen !== 'number' || !isFinite(yen)) {
-      return '計算できません';
-    }
-    var abs = Math.abs(yen);
-    if (abs < 10000) {
-      return '約' + formatComma(abs) + '円';
-    }
-    var man = Math.round(abs / 10000);
-    if (man >= 10000) {
-      var oku = Math.floor(man / 10000);
-      var rest = man % 10000;
-      return '約' + formatComma(oku) + '億' + (rest > 0 ? formatComma(rest) + '万' : '') + '円';
-    }
-    return '約' + formatComma(man) + '万円';
-  }
-
-  /* 入力欄の下に出すカンマ区切りの補助表示 */
-  function formatAid(value) {
-    var text = formatComma(value) + '円';
-    if (value >= 10000) {
-      var man = value / 10000;
-      text += man === Math.floor(man)
-        ? '（' + formatComma(man) + '万円）'
-        : '（約' + formatComma(Math.round(man)) + '万円）';
-    }
-    return text;
-  }
-
-  /* ---------- 入力の読み取り ---------- */
-
-  function readNumber(inputEl) {
-    var raw = inputEl.value.trim();
-    if (raw === '') {
-      if (inputEl.validity && inputEl.validity.badInput) {
-        return { error: '数値で入力してください。' };
-      }
-      return { empty: true };
-    }
-    var value = Number(raw);
-    if (!isFinite(value)) {
-      return { error: '数値で入力してください。' };
-    }
-    return { value: value };
-  }
-
-  /* 金額欄（0以上の数値のみ） */
-  function readYen(inputEl) {
-    var r = readNumber(inputEl);
-    if (r.error || r.empty) {
-      return r;
-    }
-    if (r.value < 0) {
-      return { error: '0以上の金額を入力してください。' };
-    }
-    return r;
-  }
-
-  /* ---------- エラー表示 ---------- */
-
-  var allFieldIds = [
-    'monthly-salary',
-    'annual-bonus',
-    'annual-social-cost',
-    'annual-other-cost',
-    'initial-hiring-cost',
-    'gross-margin',
-    'expected-monthly-sales',
-    'helper-sales',
-    'helper-cost'
-  ];
-
-  function showFieldError(fieldId, message) {
-    var input = $(fieldId);
-    var errorEl = $(fieldId + '-error');
-    if (errorEl) {
-      errorEl.textContent = message;
-      errorEl.hidden = false;
-    }
-    if (input) {
-      input.classList.add('input-error');
-      input.setAttribute('aria-invalid', 'true');
-    }
-  }
-
-  function clearFieldError(fieldId) {
-    var input = $(fieldId);
-    var errorEl = $(fieldId + '-error');
-    if (errorEl) {
-      errorEl.textContent = '';
-      errorEl.hidden = true;
-    }
-    if (input) {
-      input.classList.remove('input-error');
-      input.removeAttribute('aria-invalid');
-    }
-  }
-
-  function hideHelperMessages() {
-    var errorEl = $('margin-helper-error');
-    var resultEl = $('margin-helper-result');
-    errorEl.textContent = '';
-    errorEl.hidden = true;
-    resultEl.textContent = '';
-    resultEl.hidden = true;
-  }
+  var $ = KT.$;
+  var formatComma = KT.formatComma;
+  var formatApproxYen = KT.formatApproxYen;
+  var resultRow = KT.resultRow;
+  var resultBlock = KT.resultBlock;
 
   /* ---------- 計算 ---------- */
 
@@ -156,23 +43,6 @@
   }
 
   /* ---------- 結果表示 ---------- */
-
-  function resultRow(label, value, isTotal) {
-    return '<div class="result-row' + (isTotal ? ' result-row-total' : '') + '">' +
-      '<span class="result-row-label">' + label + '</span>' +
-      '<span class="result-row-value">' + value + '</span>' +
-      '</div>';
-  }
-
-  function resultBlock(title, rows, note) {
-    var html = '<section class="result-block"><h3>' + title + '</h3>';
-    html += rows.join('');
-    if (note) {
-      html += '<p class="result-note">' + note + '</p>';
-    }
-    html += '</section>';
-    return html;
-  }
 
   function impactText(value) {
     if (typeof value !== 'number' || !isFinite(value)) {
@@ -267,101 +137,28 @@
     return;
   }
 
-  /* 金額欄のカンマ区切り補助表示 */
-  var aidFieldIds = [
+  var allFieldIds = [
     'monthly-salary',
     'annual-bonus',
     'annual-social-cost',
     'annual-other-cost',
     'initial-hiring-cost',
+    'gross-margin',
     'expected-monthly-sales',
     'helper-sales',
     'helper-cost'
   ];
-  aidFieldIds.forEach(function (fieldId) {
-    var input = $(fieldId);
-    var aid = $(fieldId + '-aid');
-    if (!input || !aid) {
-      return;
-    }
-    input.addEventListener('input', function () {
-      var r = readNumber(input);
-      aid.textContent = (r.value !== undefined && r.value >= 0) ? formatAid(r.value) : '';
-    });
-  });
 
-  /* 入力し直したら、その欄のエラーを消す */
-  allFieldIds.forEach(function (fieldId) {
-    var input = $(fieldId);
-    if (!input) {
-      return;
-    }
-    input.addEventListener('input', function () {
-      clearFieldError(fieldId);
-      if (fieldId === 'helper-sales' || fieldId === 'helper-cost') {
-        hideHelperMessages();
-      }
-    });
-  });
+  KT.setupFields(allFieldIds);
+  KT.setupMarginHelper('gross-margin');
 
-  /* 粗利益率の補助計算 */
-  $('apply-margin').addEventListener('click', function () {
-    clearFieldError('helper-sales');
-    clearFieldError('helper-cost');
-    hideHelperMessages();
-
-    var salesRes = readYen($('helper-sales'));
-    var costRes = readYen($('helper-cost'));
-    var hasError = false;
-
-    if (salesRes.error) {
-      showFieldError('helper-sales', salesRes.error);
-      hasError = true;
-    } else if (salesRes.empty) {
-      showFieldError('helper-sales', '売上高を入力してください。');
-      hasError = true;
-    } else if (salesRes.value === 0) {
-      showFieldError('helper-sales', '売上高が0円のままでは粗利益率を計算できません。0より大きい金額を入力してください。');
-      hasError = true;
-    }
-
-    if (costRes.error) {
-      showFieldError('helper-cost', costRes.error);
-      hasError = true;
-    } else if (costRes.empty) {
-      showFieldError('helper-cost', '売上原価を入力してください。ない場合は0を入力してください。');
-      hasError = true;
-    }
-
-    if (hasError) {
-      return;
-    }
-
-    var marginPercent = ((salesRes.value - costRes.value) / salesRes.value) * 100;
-    if (marginPercent <= 0) {
-      var helperError = $('margin-helper-error');
-      helperError.textContent = '売上原価が売上高以上のため、粗利益率が0％以下になり計算できません。金額をご確認ください。';
-      helperError.hidden = false;
-      return;
-    }
-
-    var rounded = Math.round(marginPercent * 10) / 10;
-    $('gross-margin').value = String(rounded);
-    clearFieldError('gross-margin');
-
-    var helperResult = $('margin-helper-result');
-    helperResult.textContent = '粗利益率 ' + rounded + '％ を上の入力欄に反映しました。';
-    helperResult.hidden = false;
-  });
-
-  /* 計算の実行 */
   form.addEventListener('submit', function (event) {
     event.preventDefault();
 
     /* 古い結果・エラーを消す */
     resultSection.hidden = true;
     resultSection.innerHTML = '';
-    allFieldIds.forEach(clearFieldError);
+    allFieldIds.forEach(KT.clearFieldError);
 
     var requiredYenFields = [
       { id: 'monthly-salary', key: 'monthlySalary' },
@@ -375,11 +172,11 @@
     var firstInvalid = null;
 
     requiredYenFields.forEach(function (field) {
-      var res = readYen($(field.id));
+      var res = KT.readYen($(field.id));
       if (res.error) {
-        showFieldError(field.id, res.error);
+        KT.showFieldError(field.id, res.error);
       } else if (res.empty) {
-        showFieldError(field.id, '必須項目です。金額を入力してください（ない場合は0）。');
+        KT.showFieldError(field.id, '必須項目です。金額を入力してください（ない場合は0）。');
       } else {
         input[field.key] = res.value;
         return;
@@ -389,15 +186,15 @@
       }
     });
 
-    var marginRes = readNumber($('gross-margin'));
+    var marginRes = KT.readNumber($('gross-margin'));
     if (marginRes.error) {
-      showFieldError('gross-margin', marginRes.error);
+      KT.showFieldError('gross-margin', marginRes.error);
     } else if (marginRes.empty) {
-      showFieldError('gross-margin', '必須項目です。粗利益率（％）を入力してください。');
+      KT.showFieldError('gross-margin', '必須項目です。粗利益率（％）を入力してください。');
     } else if (marginRes.value <= 0) {
-      showFieldError('gross-margin', '粗利益率は0より大きい値を入力してください。0％のままでは必要売上を計算できません。');
+      KT.showFieldError('gross-margin', '粗利益率は0より大きい値を入力してください。0％のままでは必要売上を計算できません。');
     } else if (marginRes.value > 100) {
-      showFieldError('gross-margin', '粗利益率は100以下で入力してください。');
+      KT.showFieldError('gross-margin', '粗利益率は100以下で入力してください。');
     } else {
       input.grossMarginPercent = marginRes.value;
     }
@@ -405,9 +202,9 @@
       firstInvalid = $('gross-margin');
     }
 
-    var expectedRes = readYen($('expected-monthly-sales'));
+    var expectedRes = KT.readYen($('expected-monthly-sales'));
     if (expectedRes.error) {
-      showFieldError('expected-monthly-sales', expectedRes.error);
+      KT.showFieldError('expected-monthly-sales', expectedRes.error);
       if (!firstInvalid) {
         firstInvalid = $('expected-monthly-sales');
       }
