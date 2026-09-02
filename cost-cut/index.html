@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>その経費削減、売上いくら分？経費削減シミュレーター｜経営tools</title>
+  <meta name="description" content="経費削減の利益効果が、売上のいくら分の増加に相当するかを無料で計算します。粗利益率が低い会社ほど、経費削減の価値は大きくなります。登録不要・入力内容は保存されません。">
+  <link rel="canonical" href="https://keiei-tools.jp/cost-cut/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="その経費削減、売上いくら分の利益効果？">
+  <meta property="og:description" content="経費削減の利益効果が、売上いくら分の増加に相当するかを無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/cost-cut/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">その経費削減、売上いくら分の利益効果？</h1>
+    <p class="page-lead">経費の削減は、そのまま利益の増加になります。同じ利益を売上の増加で得ようとすると、実はもっと大きな金額が必要です。削減額が売上いくら分に相当するかを計算します。</p>
+
+    <form id="costcut-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="monthly-cut">削減できる経費（円/月）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="monthly-cut-desc">見直しで毎月減らせる経費の見込み額</p>
+        <input type="number" id="monthly-cut" inputmode="numeric" min="0" step="1" placeholder="例）100000" aria-describedby="monthly-cut-desc monthly-cut-error">
+        <p class="field-aid" id="monthly-cut-aid"></p>
+        <p class="field-error" id="monthly-cut-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="gross-margin">粗利益率（％）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="gross-margin-desc">売上に対して粗利益（売上高 − 売上原価）が何％残るか</p>
+        <input type="number" id="gross-margin" inputmode="decimal" min="0" max="100" step="0.1" placeholder="例）30" aria-describedby="gross-margin-desc gross-margin-error">
+        <p class="field-error" id="gross-margin-error" hidden></p>
+
+        <details class="margin-helper">
+          <summary>粗利益率がわからない方</summary>
+          <div class="margin-helper-body">
+            <p class="field-desc">直近1年間など、わかる範囲の「売上高」と「売上原価」を入力してください。粗利益率 ＝（売上高 − 売上原価）÷ 売上高 × 100 で計算し、上の入力欄に反映します。</p>
+            <div class="field">
+              <label for="helper-sales">売上高（円）</label>
+              <input type="number" id="helper-sales" inputmode="numeric" min="0" step="1" placeholder="例）100000000" aria-describedby="helper-sales-error">
+              <p class="field-aid" id="helper-sales-aid"></p>
+              <p class="field-error" id="helper-sales-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="helper-cost">売上原価（円）</label>
+              <input type="number" id="helper-cost" inputmode="numeric" min="0" step="1" placeholder="例）70000000" aria-describedby="helper-cost-error">
+              <p class="field-aid" id="helper-cost-aid"></p>
+              <p class="field-error" id="helper-cost-error" hidden></p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="apply-margin">粗利益率を計算して反映</button>
+            <p class="field-error" id="margin-helper-error" hidden></p>
+            <p class="helper-result" id="margin-helper-result" hidden></p>
+          </div>
+        </details>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>売上は粗利益率の分しか会社に残りませんが、経費の削減は全額がそのまま利益になります。そのため、経費削減と同じ利益効果を売上で得るには「削減額 ÷ 粗利益率」の売上増加が必要です。例えば粗利益率30％の会社なら、月10万円の経費削減は、月約33万円の売上増加と同じ利益効果になります。</p>
+      <p>ただし、経費の中には売上を生むための費用（広告費、営業経費、教育費など）も含まれます。そうした費用を削ると売上自体が減る場合があるため、この計算は「売上に影響しない経費」の見直しに使うのが適しています。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の損益を保証するものではありません。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/cost-cut.js" defer></script>
+</body>
+</html>
