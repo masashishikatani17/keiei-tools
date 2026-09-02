@@ -492,6 +492,11 @@ input[type="number"] {
   border-top: 1px solid var(--color-border);
 }
 
+.feedback-link {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+}
+
 .disclaimer {
   margin: 0 0 12px;
   font-size: 0.8rem;
