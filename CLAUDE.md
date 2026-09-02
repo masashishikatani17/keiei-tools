@@ -50,6 +50,10 @@ keiei-tools/
 │   └── ツール名.js      # 各ツールの計算処理
 ├── sitemap.xml         # 全ページを列挙（ページ追加時に更新する）
 ├── robots.txt
+├── 404.html            # 自己完結スタイル（どの階層でも表示されるため）
+├── favicon.svg         # サイトアイコン（各ページから相対パスで参照）
+├── apple-touch-icon.png
+├── og-image.png        # OGP共有画像（og:imageは絶対URLで参照）
 ├── CNAME               # GitHub Pagesの独自ドメイン設定（削除しない）
 ├── README.md
 └── CLAUDE.md
