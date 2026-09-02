@@ -136,6 +136,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-investment');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

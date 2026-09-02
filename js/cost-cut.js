@@ -93,6 +93,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-cost-cut');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

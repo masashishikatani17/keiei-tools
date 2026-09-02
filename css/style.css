@@ -498,6 +498,12 @@ input[type="number"] {
   color: var(--color-muted);
 }
 
+.analytics-note {
+  margin: 0 0 12px;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
 .copyright {
   margin: 0;
   font-size: 0.8rem;

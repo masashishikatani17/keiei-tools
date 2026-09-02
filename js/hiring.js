@@ -220,6 +220,7 @@
     var result = compute(input);
     renderResult(resultSection, input, result);
     resultSection.hidden = false;
+    KT.trackEvent('calc-hiring');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

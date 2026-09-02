@@ -108,6 +108,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-margin');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

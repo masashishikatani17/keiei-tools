@@ -137,6 +137,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-cash');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

@@ -222,8 +222,22 @@ window.KT = (function () {
     });
   }
 
+  /* ---------- アクセス計測（GoatCounter） ----------
+     計算実行などのイベントを記録する。計測がブロックされていても
+     ツールの動作には影響させない。入力値は送信しない。 */
+  function trackEvent(name) {
+    try {
+      if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        window.goatcounter.count({ path: name, event: true });
+      }
+    } catch (ignore) {
+      /* 計測の失敗は無視する */
+    }
+  }
+
   return {
     $: $,
+    trackEvent: trackEvent,
     formatComma: formatComma,
     formatApproxYen: formatApproxYen,
     formatPercent1: formatPercent1,

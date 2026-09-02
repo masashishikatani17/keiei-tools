@@ -141,6 +141,7 @@
 
     renderResult(resultSection, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-breakeven');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

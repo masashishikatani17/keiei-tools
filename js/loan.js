@@ -172,6 +172,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-loan');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

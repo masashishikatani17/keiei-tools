@@ -115,6 +115,7 @@
 
     renderResult(resultSection, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-target-profit');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();

@@ -155,6 +155,7 @@
 
     renderResult(resultSection, input, compute(input));
     resultSection.hidden = false;
+    KT.trackEvent('calc-discount');
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();
