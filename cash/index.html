@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>いまの現金で会社はあと何か月もつ？資金繰りシミュレーター｜経営tools</title>
+  <meta name="description" content="現金・預金残高と毎月の収支から、今のペースが続いた場合に現金があと何か月もつかを無料で計算します。登録不要・入力内容は保存されません。">
+  <link rel="canonical" href="https://keiei-tools.jp/cash/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="いまの現金で、会社はあと何か月もつ？">
+  <meta property="og:description" content="現金残高と毎月の収支から、現金があと何か月もつかを無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/cash/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">いまの現金で、会社はあと何か月もつ？</h1>
+    <p class="page-lead">現金・預金の残高と毎月の収支から、今のペースが続いた場合に現金が何か月もつかを計算します。資金の手当てをいつまでに考えるべきか、時間の目安をつかむためのツールです。</p>
+
+    <form id="cash-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="cash-balance">現在の現金・預金残高（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="cash-balance-desc">会社の現金と、すぐに使える預金の合計</p>
+        <input type="number" id="cash-balance" inputmode="numeric" min="0" step="1" placeholder="例）10000000" aria-describedby="cash-balance-desc cash-balance-error">
+        <p class="field-aid" id="cash-balance-aid"></p>
+        <p class="field-error" id="cash-balance-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="monthly-out">月間の支出合計（円/月）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="monthly-out-desc">仕入、人件費、家賃、借入返済など、毎月出ていくお金の合計</p>
+        <input type="number" id="monthly-out" inputmode="numeric" min="0" step="1" placeholder="例）4500000" aria-describedby="monthly-out-desc monthly-out-error">
+        <p class="field-aid" id="monthly-out-aid"></p>
+        <p class="field-error" id="monthly-out-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="monthly-in">月間の収入合計（円/月）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="monthly-in-desc">売上の入金など、毎月入ってくるお金の合計。ない場合は0</p>
+        <input type="number" id="monthly-in" inputmode="numeric" min="0" step="1" placeholder="例）3300000" aria-describedby="monthly-in-desc monthly-in-error">
+        <p class="field-aid" id="monthly-in-aid"></p>
+        <p class="field-error" id="monthly-in-error" hidden></p>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>残り月数は「現金・預金残高 ÷ 毎月減っていく金額（支出 − 収入）」で計算しています。今の収支がそのまま続いた場合の単純計算であり、実際には入金・支払いのタイミングのずれ、賞与や納税の月、季節による売上の波などで変動します。</p>
+      <p>この数字は「会社の良し悪し」ではなく「時間の余裕」を表します。残り月数が短いほど、融資の相談、経費の見直し、入金サイトの交渉などの手当てを早く始める必要がある、という時間軸の目安として使ってください。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の資金繰りを保証するものではありません。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/cash.js" defer></script>
+</body>
+</html>
