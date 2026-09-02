@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>粗利益率の計算｜うちの粗利は何％？｜経営tools</title>
+  <meta name="description" content="売上高と売上原価を入れるだけで、粗利益率・粗利益額・原価率を無料で計算します。経営判断の基本になる数字です。登録不要・入力内容は保存されません。">
+  <link rel="canonical" href="https://keiei-tools.jp/margin/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="うちの粗利益率は何％？">
+  <meta property="og:description" content="売上高と売上原価から、粗利益率・粗利益額を無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/margin/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">うちの粗利益率は何％？</h1>
+    <p class="page-lead">売上高と売上原価を入れるだけで、粗利益率と粗利益額を計算します。損益分岐点、値決め、採用判断など、多くの経営判断の土台になるいちばん基本の数字です。期間は月でも年でも構いません（2つの数字を同じ期間で揃えてください）。</p>
+
+    <form id="margin-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="sales-amount">売上高（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="sales-amount-desc">対象期間の売上の合計</p>
+        <input type="number" id="sales-amount" inputmode="numeric" min="0" step="1" placeholder="例）30000000" aria-describedby="sales-amount-desc sales-amount-error">
+        <p class="field-aid" id="sales-amount-aid"></p>
+        <p class="field-error" id="sales-amount-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="cost-amount">売上原価（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="cost-amount-desc">仕入や材料費、外注費など、売上に直接対応する費用の合計。ない場合は0</p>
+        <input type="number" id="cost-amount" inputmode="numeric" min="0" step="1" placeholder="例）19500000" aria-describedby="cost-amount-desc cost-amount-error">
+        <p class="field-aid" id="cost-amount-aid"></p>
+        <p class="field-error" id="cost-amount-error" hidden></p>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>粗利益率は「（売上高 − 売上原価）÷ 売上高 × 100」で計算します。粗利益は、そこから家賃や人件費などの固定費を払い、最後に利益を残すための「元手」です。粗利益率が分かると、売上がいくら増えたら利益がいくら増えるかを見積もれるようになります。</p>
+      <p>適正な水準は業種によって大きく異なります（卸売業は低め、サービス業は高め、など）。他社と比べる場合は、同じ業種・同じ商流の会社と比べてください。</p>
+      <p>粗利益率が分かったら、<a href="../breakeven/">損益分岐点シミュレーター</a>で「月にいくら売れば赤字にならないか」も確認できます。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。会計上の正確な数値は決算書・試算表でご確認ください。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/margin.js" defer></script>
+</body>
+</html>
