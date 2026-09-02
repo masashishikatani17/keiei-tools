@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>借入の月々の返済額はいくら？返済シミュレーター｜経営tools</title>
+  <meta name="description" content="借入金額・年利・返済期間から、毎月の返済額と総返済額・利息を無料で計算します（元利均等返済）。粗利益率を入れると返済に必要な売上の目安も計算できます。">
+  <link rel="canonical" href="https://keiei-tools.jp/loan/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="この借入、月々の返済額はいくら？">
+  <meta property="og:description" content="借入金額・年利・返済期間から、毎月の返済額と総返済額を無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/loan/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">この借入、月々の返済額はいくら？</h1>
+    <p class="page-lead">借入金額・年利・返済期間から、毎月の返済額、総返済額、利息の合計を計算します。粗利益率を入れると、返済を売上でまかなうとした場合に必要な売上の目安も表示します。</p>
+
+    <form id="loan-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="loan-amount">借入金額（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="loan-amount-desc">借り入れる（借り入れた）金額</p>
+        <input type="number" id="loan-amount" inputmode="numeric" min="0" step="1" placeholder="例）10000000" aria-describedby="loan-amount-desc loan-amount-error">
+        <p class="field-aid" id="loan-amount-aid"></p>
+        <p class="field-error" id="loan-amount-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="annual-rate">年利（％）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="annual-rate-desc">借入の年利率。固定金利を想定した概算です</p>
+        <input type="number" id="annual-rate" inputmode="decimal" min="0" max="30" step="0.01" placeholder="例）2.5" aria-describedby="annual-rate-desc annual-rate-error">
+        <p class="field-error" id="annual-rate-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="loan-years">返済期間（年）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="loan-years-desc">何年で返済するか</p>
+        <input type="number" id="loan-years" inputmode="decimal" min="0" max="50" step="0.5" placeholder="例）7" aria-describedby="loan-years-desc loan-years-error">
+        <p class="field-error" id="loan-years-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="gross-margin">粗利益率（％）<span class="badge badge-optional">任意</span></label>
+        <p class="field-desc" id="gross-margin-desc">入力すると、返済を売上でまかなう場合に必要な売上の目安も表示します</p>
+        <input type="number" id="gross-margin" inputmode="decimal" min="0" max="100" step="0.1" placeholder="例）30" aria-describedby="gross-margin-desc gross-margin-error">
+        <p class="field-error" id="gross-margin-error" hidden></p>
+
+        <details class="margin-helper">
+          <summary>粗利益率がわからない方</summary>
+          <div class="margin-helper-body">
+            <p class="field-desc">直近1年間など、わかる範囲の「売上高」と「売上原価」を入力してください。粗利益率 ＝（売上高 − 売上原価）÷ 売上高 × 100 で計算し、上の入力欄に反映します。</p>
+            <div class="field">
+              <label for="helper-sales">売上高（円）</label>
+              <input type="number" id="helper-sales" inputmode="numeric" min="0" step="1" placeholder="例）100000000" aria-describedby="helper-sales-error">
+              <p class="field-aid" id="helper-sales-aid"></p>
+              <p class="field-error" id="helper-sales-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="helper-cost">売上原価（円）</label>
+              <input type="number" id="helper-cost" inputmode="numeric" min="0" step="1" placeholder="例）70000000" aria-describedby="helper-cost-error">
+              <p class="field-aid" id="helper-cost-aid"></p>
+              <p class="field-error" id="helper-cost-error" hidden></p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="apply-margin">粗利益率を計算して反映</button>
+            <p class="field-error" id="margin-helper-error" hidden></p>
+            <p class="helper-result" id="margin-helper-result" hidden></p>
+          </div>
+        </details>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>毎月の返済額は、毎月同じ金額を返す「元利均等返済」を前提に計算しています。返済初期は利息の割合が大きく、後半になるほど元金の割合が増えていきます。実際の返済額は、金融機関の条件（据置期間、元金均等方式、金利の変動など）により変わります。</p>
+      <p>「返済に必要な売上」は、毎月の返済額 ÷ 粗利益率で計算した簡易的な目安です。実際の返済原資は、税金を払った後の利益に減価償却費などを加えたお金であり、粗利益がそのまま返済に使えるわけではない点にご注意ください。</p>
+      <p>本ツールは返済額の計算のみを行うもので、借入の可否や適否を判断するものではありません。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の融資条件・返済額を保証するものではありません。最終的な経営判断は、金融機関や専門家に実際の条件を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/loan.js" defer></script>
+</body>
+</html>
