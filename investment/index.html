@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>この設備投資、何年で回収できる？投資回収シミュレーター｜経営tools</title>
+  <meta name="description" content="投資額と、その投資で増える月間の粗利益（または減る経費）から、投資を回収できるまでの期間を無料で計算します。登録不要・入力内容は保存されません。">
+  <link rel="canonical" href="https://keiei-tools.jp/investment/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="この設備投資、何年で回収できる？">
+  <meta property="og:description" content="投資額と増える粗利益から、投資を回収できるまでの期間を無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/investment/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">この設備投資、何年で回収できる？</h1>
+    <p class="page-lead">機械、車両、システム、店舗改装など、まとまった投資を検討するときの基本の数字が「何年で元が取れるか」です。投資額と、その投資で増える粗利益（または減る経費）から回収期間を計算します。</p>
+
+    <form id="investment-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="investment-amount">投資額（円）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="investment-amount-desc">設備の購入費、工事費、導入費用などの合計</p>
+        <input type="number" id="investment-amount" inputmode="numeric" min="0" step="1" placeholder="例）5000000" aria-describedby="investment-amount-desc investment-amount-error">
+        <p class="field-aid" id="investment-amount-aid"></p>
+        <p class="field-error" id="investment-amount-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="monthly-gain">この投資で増える月間の粗利益（円/月）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="monthly-gain-desc">投資によって毎月増える粗利益、または毎月減る経費の見込み額</p>
+        <input type="number" id="monthly-gain" inputmode="numeric" min="0" step="1" placeholder="例）250000" aria-describedby="monthly-gain-desc monthly-gain-error">
+        <p class="field-aid" id="monthly-gain-aid"></p>
+        <p class="field-error" id="monthly-gain-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="monthly-maintain">この投資の維持費（円/月）<span class="badge badge-optional">任意</span></label>
+        <p class="field-desc" id="monthly-maintain-desc">保守料、リース料、光熱費の増加など、投資に伴って毎月かかる費用。ない場合は空欄か0</p>
+        <input type="number" id="monthly-maintain" inputmode="numeric" min="0" step="1" placeholder="例）50000" aria-describedby="monthly-maintain-desc monthly-maintain-error">
+        <p class="field-aid" id="monthly-maintain-aid"></p>
+        <p class="field-error" id="monthly-maintain-error" hidden></p>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>回収期間は「投資額 ÷（増える粗利益 − 維持費）」で計算する、単純回収期間と呼ばれる方法です。金利、税金、減価償却は考慮していない概算ですが、投資判断の最初のものさしとして広く使われています。</p>
+      <p>回収期間だけでなく、設備が使える年数（耐用年数）との比較も大切です。回収に必要な期間が設備の寿命より長い場合、その投資は数字の上では元が取れない計算になります。逆に回収が終わった後は、毎月の純増分がそのまま利益側に効いてきます。</p>
+      <p>なお「増える粗利益」の見込みが不確かな場合は、控えめな数字でも計算してみると、前提が崩れたときの回収期間の変化を確認できます。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の投資効果を保証するものではありません。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/investment.js" defer></script>
+</body>
+</html>
