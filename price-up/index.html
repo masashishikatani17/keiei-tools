@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>値上げしたら客数が何％減っても大丈夫？値上げシミュレーター｜経営tools</title>
+  <meta name="description" content="値上げ率と粗利益率から、値上げ後に客数（販売数）が何％減るまでなら値上げ前の粗利益額を維持できるかを無料で計算します。登録不要・入力内容は保存されません。">
+  <link rel="canonical" href="https://keiei-tools.jp/price-up/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="経営tools">
+  <meta property="og:title" content="値上げしたら、客数が何％減っても大丈夫？">
+  <meta property="og:description" content="値上げ率と粗利益率から、利益を維持できる客数減少の許容ラインを無料で計算できます。">
+  <meta property="og:url" content="https://keiei-tools.jp/price-up/">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="site-logo" href="../">経営tools</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1 class="page-title">値上げしたら、客数が何％減っても大丈夫？</h1>
+    <p class="page-lead">値上げをためらう一番の理由は「客離れ」です。このツールは、値上げ後に客数（販売数）が何％減るまでなら、値上げ前と同じ粗利益額を維持できるかを計算します。</p>
+
+    <form id="priceup-form" class="panel" novalidate autocomplete="off">
+      <div class="field">
+        <label for="price-up-rate">値上げ率（％）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="price-up-rate-desc">価格を何％上げるか（例：1,000円 → 1,100円なら10）</p>
+        <input type="number" id="price-up-rate" inputmode="decimal" min="0" max="100" step="0.1" placeholder="例）10" aria-describedby="price-up-rate-desc price-up-rate-error">
+        <p class="field-error" id="price-up-rate-error" hidden></p>
+      </div>
+
+      <div class="field">
+        <label for="gross-margin">現在の粗利益率（％）<span class="badge badge-required">必須</span></label>
+        <p class="field-desc" id="gross-margin-desc">売上に対して粗利益（売上高 − 売上原価）が何％残るか</p>
+        <input type="number" id="gross-margin" inputmode="decimal" min="0" max="100" step="0.1" placeholder="例）30" aria-describedby="gross-margin-desc gross-margin-error">
+        <p class="field-error" id="gross-margin-error" hidden></p>
+
+        <details class="margin-helper">
+          <summary>粗利益率がわからない方</summary>
+          <div class="margin-helper-body">
+            <p class="field-desc">直近1年間など、わかる範囲の「売上高」と「売上原価」を入力してください。粗利益率 ＝（売上高 − 売上原価）÷ 売上高 × 100 で計算し、上の入力欄に反映します。</p>
+            <div class="field">
+              <label for="helper-sales">売上高（円）</label>
+              <input type="number" id="helper-sales" inputmode="numeric" min="0" step="1" placeholder="例）100000000" aria-describedby="helper-sales-error">
+              <p class="field-aid" id="helper-sales-aid"></p>
+              <p class="field-error" id="helper-sales-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="helper-cost">売上原価（円）</label>
+              <input type="number" id="helper-cost" inputmode="numeric" min="0" step="1" placeholder="例）70000000" aria-describedby="helper-cost-error">
+              <p class="field-aid" id="helper-cost-aid"></p>
+              <p class="field-error" id="helper-cost-error" hidden></p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="apply-margin">粗利益率を計算して反映</button>
+            <p class="field-error" id="margin-helper-error" hidden></p>
+            <p class="helper-result" id="margin-helper-result" hidden></p>
+          </div>
+        </details>
+      </div>
+
+      <div class="field">
+        <label for="monthly-sales">現在の月間売上（円/月）<span class="badge badge-optional">任意</span></label>
+        <p class="field-desc" id="monthly-sales-desc">入力すると、客数が変わらなかった場合に増える粗利益額も表示します</p>
+        <input type="number" id="monthly-sales" inputmode="numeric" min="0" step="1" placeholder="例）5000000" aria-describedby="monthly-sales-desc monthly-sales-error">
+        <p class="field-aid" id="monthly-sales-aid"></p>
+        <p class="field-error" id="monthly-sales-error" hidden></p>
+      </div>
+
+      <p class="privacy-note">入力内容は保存・送信されません。このブラウザ内だけで計算します。</p>
+
+      <button type="submit" class="btn btn-primary btn-block">計算する</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden></section>
+
+    <section class="explain">
+      <h2>この数字の見方</h2>
+      <p>許容ラインは「値上げ率 ÷（粗利益率 ＋ 値上げ率）」で計算しています。値上げ分は仕入や原価が増えないため、そのまま粗利益の増加になります。例えば粗利益率30％の会社が10％値上げすると、1個あたりの粗利益は30から40へ約1.3倍になるため、販売数が25％減っても粗利益額は値上げ前と同じという計算です。</p>
+      <p>粗利益率が低い会社ほど、値上げの効果は大きく（＝許容できる客離れが大きく）なります。なお、実際に客数がどれだけ減るかは商品や競合によって異なるため、このツールはあくまで「損益上の許容ライン」を示すものです。</p>
+      <p>逆に値引き・割引を検討している場合は、<a href="../discount/">値引きシミュレーター</a>で必要な販売数の増加を確認できます。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container narrow">
+      <p class="disclaimer">本ツールは、入力された数値に基づく概算シミュレーションです。実際の客数の変化や損益を保証するものではありません。最終的な経営判断は、実際の状況を確認したうえで行ってください。</p>
+      <p class="copyright">© 経営tools</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js" defer></script>
+  <script src="../js/price-up.js" defer></script>
+</body>
+</html>
