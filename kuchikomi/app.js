@@ -33,6 +33,17 @@
     { key: 'other', label: 'その他' }
   ];
 
+  /* 複数サービス選択時に文中へ組み込む名詞形 */
+  var SERVICE_NOUNS = {
+    komon: '税務顧問',
+    shinkoku: '確定申告',
+    souzoku: '相続の相談',
+    setsuritsu: '会社設立',
+    kichou: '記帳や経理のサポート',
+    nencho: '給与計算・年末調整',
+    yushi: '融資・資金繰りの相談'
+  };
+
   var OPENINGS = {
     komon: ['顧問税理士としてお世話になっています。', '税務顧問をお願いしています。'],
     shinkoku: ['確定申告をお願いしました。', '確定申告の際にお世話になりました。'],
@@ -60,7 +71,7 @@
 
   var state = {
     office: null,
-    q1: null,
+    q1: [],
     q1Other: '',
     q2: [],
     q2Other: '',
@@ -131,13 +142,40 @@
   function generateDrafts() {
     var seed = answerHash();
 
-    /* 書き出し */
+    /* 書き出し（複数サービス選択に対応） */
+    var nouns = [];
+    state.q1.forEach(function (key) {
+      if (key === 'other') {
+        var svc = state.q1Other.trim();
+        if (svc) { nouns.push(svc); }
+      } else {
+        nouns.push(SERVICE_NOUNS[key]);
+      }
+    });
+
+    function joinNouns(list) {
+      if (list.length <= 1) { return list[0] || ''; }
+      if (list.length === 2) { return list[0] + 'や' + list[1]; }
+      return list[0] + 'や' + list[1] + 'など';
+    }
+
     var opening;
-    if (state.q1 === 'other') {
-      var svc = state.q1Other.trim();
-      opening = svc ? svc + 'の件でお世話になりました。' : 'いろいろと相談に乗っていただいています。';
+    var hasKomon = state.q1.indexOf('komon') !== -1;
+    var othersNouns = nouns.filter(function (n) { return n !== SERVICE_NOUNS.komon; });
+
+    if (state.q1.length === 1 && state.q1[0] === 'other') {
+      var single = state.q1Other.trim();
+      opening = single ? single + 'の件でお世話になりました。' : 'いろいろと相談に乗っていただいています。';
+    } else if (state.q1.length === 1) {
+      opening = pick(OPENINGS[state.q1[0]], seed);
+    } else if (hasKomon && othersNouns.length > 0) {
+      opening = '顧問税理士としてお世話になっており、' + joinNouns(othersNouns) + 'もお願いしています。';
+    } else if (hasKomon) {
+      opening = pick(OPENINGS.komon, seed);
+    } else if (nouns.length > 0) {
+      opening = joinNouns(nouns) + 'でお世話になっています。';
     } else {
-      opening = pick(OPENINGS[state.q1], seed);
+      opening = 'いろいろと相談に乗っていただいています。';
     }
 
     /* 印象に残った点 → 文のリスト（選択順を保ちつつ、顧客ごとに言い回しを変える） */
@@ -224,7 +262,7 @@
 
   function validateCurrent() {
     if (QUESTIONS[qIndex] === 'q1') {
-      var ok1 = state.q1 !== null;
+      var ok1 = state.q1.length > 0;
       $('q1-error').hidden = ok1;
       return ok1;
     }
@@ -278,13 +316,14 @@
   state.office = office;
   $('intro-office').textContent = office.name + ' からのお願い';
 
-  renderChips('q1-chips', Q1_OPTIONS, false, function () {
-    return state.q1 ? [state.q1] : [];
+  renderChips('q1-chips', Q1_OPTIONS, true, function () {
+    return state.q1;
   }, function (key) {
-    state.q1 = key;
-    $('q1-other-wrap').hidden = (key !== 'other');
+    var idx1 = state.q1.indexOf(key);
+    if (idx1 === -1) { state.q1.push(key); } else { state.q1.splice(idx1, 1); }
+    $('q1-other-wrap').hidden = (state.q1.indexOf('other') === -1);
     $('q1-error').hidden = true;
-    updateChips('q1-chips', function () { return [state.q1]; });
+    updateChips('q1-chips', function () { return state.q1; });
   });
 
   renderChips('q2-chips', Q2_OPTIONS, true, function () {

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>口コミ作成アシスタント（試作版）</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <main class="app">
@@ -52,12 +52,12 @@
         <!-- Q1 -->
         <div class="q" id="q1" hidden>
           <h2>どのような相談・サービスを利用しましたか？</h2>
-          <p class="q-note">いちばん近いものを1つ選んでください。</p>
+          <p class="q-note">あてはまるものをすべて選んでください（複数選択できます）。</p>
           <div class="chips" id="q1-chips"></div>
           <div class="field" id="q1-other-wrap" hidden>
             <input type="text" id="q1-other" maxlength="40" placeholder="例）セカンドオピニオン">
           </div>
-          <p class="q-error" id="q1-error" hidden>1つ選んでください。</p>
+          <p class="q-error" id="q1-error" hidden>1つ以上選んでください。</p>
         </div>
 
         <!-- Q2 -->
@@ -164,8 +164,8 @@
     <p>入力内容はサーバーに送信・保存されません（試作版）。アクセス状況の把握のため、Cookieを使わない計測（GoatCounter）のみ利用しています。</p>
   </footer>
 
-  <script src="offices.js"></script>
-  <script src="app.js"></script>
+  <script src="offices.js?v=3"></script>
+  <script src="app.js?v=3"></script>
   <script data-goatcounter="https://keiei-tools.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
