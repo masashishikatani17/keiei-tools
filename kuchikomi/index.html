@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>口コミ作成アシスタント（試作版）</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+
+    <!-- エラー（トークン不正） -->
+    <section id="s-error" class="screen" hidden>
+      <div class="card center">
+        <h1>ページを表示できません</h1>
+        <p class="muted">このURLは無効か、有効期限が切れています。お手数ですが、案内メールに記載のURLをもう一度ご確認ください。</p>
+      </div>
+    </section>
+
+    <!-- 導入 -->
+    <section id="s-intro" class="screen" hidden>
+      <div class="card">
+        <p class="office-label" id="intro-office"></p>
+        <h1>日頃のご利用について、<br>率直な感想をお聞かせください</h1>
+        <p>いくつかの質問にお答えいただくと、その内容をもとに<strong>口コミの下書き</strong>をご用意します。文章を考える手間なく、3分ほどで完了します。</p>
+        <ul class="intro-points">
+          <li>質問は5つ（うち3つは任意）です</li>
+          <li>下書きは自由に修正できます</li>
+          <li>投稿するかどうかは、最後にご自身で決められます</li>
+        </ul>
+        <button class="btn btn-primary btn-block" id="btn-start" type="button">はじめる</button>
+        <p class="privacy">このページで入力した内容がそのまま自動投稿されることはありません。投稿は必ずご本人の操作で行われます。</p>
+      </div>
+    </section>
+
+    <!-- 質問共通ヘッダ -->
+    <section id="s-question" class="screen" hidden>
+      <div class="card">
+        <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+        <p class="step-label" id="step-label"></p>
+
+        <!-- Q1 -->
+        <div class="q" id="q1" hidden>
+          <h2>どのような相談・サービスを利用しましたか？</h2>
+          <p class="q-note">いちばん近いものを1つ選んでください。</p>
+          <div class="chips" id="q1-chips"></div>
+          <div class="field" id="q1-other-wrap" hidden>
+            <input type="text" id="q1-other" maxlength="40" placeholder="例）セカンドオピニオン">
+          </div>
+          <p class="q-error" id="q1-error" hidden>1つ選んでください。</p>
+        </div>
+
+        <!-- Q2 -->
+        <div class="q" id="q2" hidden>
+          <h2>印象に残った点を選んでください</h2>
+          <p class="q-note">あてはまるものすべて（複数選択できます）。</p>
+          <div class="chips" id="q2-chips"></div>
+          <div class="field" id="q2-other-wrap" hidden>
+            <input type="text" id="q2-other" maxlength="60" placeholder="その他の印象に残った点">
+          </div>
+          <p class="q-error" id="q2-error" hidden>1つ以上選んでください。</p>
+        </div>
+
+        <!-- Q3 -->
+        <div class="q" id="q3" hidden>
+          <h2>特に印象に残った出来事があれば教えてください</h2>
+          <p class="q-note">任意です。具体的なエピソードがあると、読み手に伝わりやすい口コミになります。</p>
+          <textarea id="q3-text" rows="5" maxlength="500" placeholder="例）融資の相談をしたとき、翌日には資料を用意して銀行に同行してくれました。"></textarea>
+        </div>
+
+        <!-- Q4 -->
+        <div class="q" id="q4" hidden>
+          <h2>どのような方におすすめできると思いますか？</h2>
+          <p class="q-note">任意です。</p>
+          <textarea id="q4-text" rows="4" maxlength="300" placeholder="例）はじめて税理士を探している個人事業主の方"></textarea>
+        </div>
+
+        <!-- Q5 -->
+        <div class="q" id="q5" hidden>
+          <h2>改善してほしい点があれば教えてください</h2>
+          <p class="q-note">任意です。<strong>この回答は口コミには含まれず、事務所へのフィードバックとしてのみ使われます。</strong></p>
+          <textarea id="q5-text" rows="4" maxlength="500" placeholder="率直にお書きください"></textarea>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-back" type="button">戻る</button>
+          <button class="btn btn-primary" id="btn-next" type="button">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 生成中 -->
+    <section id="s-generating" class="screen" hidden>
+      <div class="card center">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>ご回答をもとに下書きを用意しています…</p>
+      </div>
+    </section>
+
+    <!-- 下書き選択 -->
+    <section id="s-drafts" class="screen" hidden>
+      <div class="card">
+        <h2>下書きができました</h2>
+        <p class="q-note">3つの案から選んでください。次の画面で自由に修正できます。</p>
+        <div class="tabs" id="draft-tabs">
+          <button class="tab" data-style="simple" type="button">シンプル</button>
+          <button class="tab" data-style="standard" type="button">標準</button>
+          <button class="tab" data-style="detail" type="button">詳細</button>
+        </div>
+        <div class="draft-preview" id="draft-preview"></div>
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-drafts-back" type="button">回答に戻る</button>
+          <button class="btn btn-primary" id="btn-choose" type="button">この文章で進める</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 最終確認・編集 -->
+    <section id="s-edit" class="screen" hidden>
+      <div class="card">
+        <h2>内容のご確認</h2>
+        <p class="confirm-note">以下はご回答いただいた内容を読みやすく整理した文章です。実際のご経験やお気持ちと異なる部分がある場合は、必ず修正してください。</p>
+        <textarea id="edit-text" rows="9"></textarea>
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-edit-back" type="button">別の案を見る</button>
+          <button class="btn btn-primary" id="btn-to-final" type="button">この内容にする</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 投稿ステップ -->
+    <section id="s-final" class="screen" hidden>
+      <div class="card">
+        <h2>あとは貼り付けるだけです</h2>
+        <ol class="final-steps">
+          <li><strong>文章をコピー</strong>する（下のボタン）</li>
+          <li><strong>Googleの投稿画面</strong>を開く</li>
+          <li>星の数をご自身で選び、文章を<strong>貼り付けて投稿</strong>する</li>
+        </ol>
+        <div class="final-text" id="final-text"></div>
+        <button class="btn btn-primary btn-block" id="btn-copy" type="button">文章をコピーする</button>
+        <button class="btn btn-google btn-block" id="btn-google" type="button">Googleで口コミを投稿する</button>
+        <p class="q-note" id="google-note" hidden>（試作版のため、Google投稿画面のURLは未設定です）</p>
+        <p class="privacy">星の数の選択と投稿の操作は、必ずご本人が行ってください。投稿は任意であり、投稿しなくても不利益はありません。</p>
+        <p class="thanks" id="thanks" hidden>ご協力ありがとうございました。</p>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <footer class="app-footer">
+    <p>入力内容はサーバーに送信・保存されません（試作版）。アクセス状況の把握のため、Cookieを使わない計測（GoatCounter）のみ利用しています。</p>
+  </footer>
+
+  <script src="offices.js"></script>
+  <script src="app.js"></script>
+  <script data-goatcounter="https://keiei-tools.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
