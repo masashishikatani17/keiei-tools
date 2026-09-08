@@ -132,7 +132,6 @@
     q3: '',
     q4: '',
     q5: '',
-    rating: 0,
     drafts: null,
     currentTone: 'formal',
     currentStyle: 'standard',
@@ -317,37 +316,6 @@
     });
   }
 
-  /* ---------- 星（満足度・任意） ---------- */
-
-  function renderStars() {
-    var box = $('stars');
-    box.textContent = '';
-    for (var i = 1; i <= 5; i++) {
-      (function (value) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'star';
-        b.setAttribute('role', 'radio');
-        b.setAttribute('aria-label', value + '（5段階中）');
-        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6 0.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-0.9z"/></svg>';
-        b.addEventListener('click', function () {
-          state.rating = (state.rating === value) ? 0 : value;
-          updateStars();
-        });
-        box.appendChild(b);
-      })(i);
-    }
-    updateStars();
-  }
-
-  function updateStars() {
-    Array.from($('stars').children).forEach(function (b, i) {
-      var on = (i + 1) <= state.rating;
-      b.classList.toggle('on', on);
-      b.setAttribute('aria-checked', (i + 1) === state.rating ? 'true' : 'false');
-    });
-  }
-
   /* ---------- 質問ナビゲーション ---------- */
 
   function showQuestion(i) {
@@ -405,42 +373,6 @@
     $('draft-preview').textContent = state.drafts[state.currentTone][state.currentStyle];
   }
 
-  /* ---------- メール控え（顧客本人がメールアプリから送る） ---------- */
-
-  function labelsFor(options, keys, otherText) {
-    var labels = [];
-    keys.forEach(function (k) {
-      if (k === 'other') {
-        labels.push(otherText.trim() ? 'その他（' + otherText.trim() + '）' : 'その他');
-      } else {
-        var opt = options.filter(function (o) { return o.key === k; })[0];
-        if (opt) { labels.push(opt.label); }
-      }
-    });
-    return labels.join('、');
-  }
-
-  function buildMailHref() {
-    var office = state.office;
-    if (!office.email) { return ''; }
-    var lines = [
-      '【口コミ作成アシスタント 回答控え】',
-      '事務所: ' + office.name,
-      '利用サービス: ' + (labelsFor(Q1_OPTIONS, state.q1, state.q1Other) || '（未回答）'),
-      '印象に残った点: ' + (labelsFor(Q2_OPTIONS, state.q2, state.q2Other) || '（未回答）'),
-      '印象に残った出来事: ' + (state.q3.trim() || '（記入なし）'),
-      'おすすめしたい人: ' + (state.q4.trim() || '（記入なし）'),
-      '改善してほしい点: ' + (state.q5.trim() || '（記入なし）'),
-      '全体の満足度: ' + (state.rating > 0 ? '★' + state.rating + '（5段階中）' : '（未選択）'),
-      '',
-      '--- 作成した口コミ文 ---',
-      state.finalText
-    ];
-    return 'mailto:' + office.email +
-      '?subject=' + encodeURIComponent('口コミ作成アシスタント 回答控え（' + office.name + '）') +
-      '&body=' + encodeURIComponent(lines.join('\n'));
-  }
-
   /* ---------- 初期化 ---------- */
 
   var params = new URLSearchParams(location.search);
@@ -473,8 +405,6 @@
     $('q2-error').hidden = true;
     updateChips('q2-chips', function () { return state.q2; });
   });
-
-  renderStars();
 
   $('btn-start').addEventListener('click', function () {
     track('kuchikomi-start');
@@ -522,18 +452,6 @@
     state.finalText = text;
     $('final-text').textContent = text;
     $('google-note').hidden = !!state.office.reviewUrl;
-    var mailHref = buildMailHref();
-    $('btn-mail').hidden = !mailHref;
-    $('mail-note').hidden = !mailHref;
-    if (mailHref) { $('btn-mail').href = mailHref; }
-    /* 本人が選んだ満足度の再掲（参考表示のみ。星の選択はGoogle画面で本人が行う） */
-    var ratingRef = $('rating-ref');
-    if (state.rating > 0) {
-      ratingRef.textContent = 'ご参考：先ほどお答えいただいた満足度は ★' + state.rating + '（5段階中）でした。Googleでの星は、投稿画面でご自身の判断でお選びください。';
-      ratingRef.hidden = false;
-    } else {
-      ratingRef.hidden = true;
-    }
     show('s-final');
   });
 

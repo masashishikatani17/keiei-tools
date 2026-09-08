@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>口コミ作成アシスタント（試作版）</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <main class="app">
@@ -87,13 +87,8 @@
 
         <!-- Q5 -->
         <div class="q" id="q5" hidden>
-          <h2>全体の満足度と、改善してほしい点</h2>
-          <div class="rating-block">
-            <p class="rating-label">全体の満足度（任意）</p>
-            <div class="stars" id="stars" role="radiogroup" aria-label="全体の満足度"></div>
-            <p class="q-note">参考としてお聞きするものです。この選択で、この後の流れが変わることはありません。Googleでの星は、投稿画面でご自身が選択します。</p>
-          </div>
-          <p class="q-note" style="margin-top:18px;">改善してほしい点があればお書きください（任意）。<strong>この回答は口コミには含まれず、事務所へのフィードバックとしてのみ使われます。</strong></p>
+          <h2>改善してほしい点があれば教えてください</h2>
+          <p class="q-note">任意です。<strong>この回答は口コミには含まれず、事務所へのフィードバックとしてのみ使われます。</strong></p>
           <textarea id="q5-text" rows="4" maxlength="500" placeholder="率直にお書きください"></textarea>
         </div>
 
@@ -158,13 +153,10 @@
           <li><strong>Googleの投稿画面</strong>を開く</li>
           <li>星の数をご自身で選び、文章を<strong>貼り付けて投稿</strong>する</li>
         </ol>
-        <p class="q-note" id="rating-ref" hidden></p>
         <div class="final-text" id="final-text"></div>
         <button class="btn btn-primary btn-block" id="btn-copy" type="button">文章をコピーする</button>
         <button class="btn btn-google btn-block" id="btn-google" type="button">Googleで口コミを投稿する</button>
         <p class="q-note" id="google-note" hidden>（試作版のため、Google投稿画面のURLは未設定です）</p>
-        <a class="btn btn-ghost btn-block" id="btn-mail" href="#" hidden>回答の控えを事務所へメールで送る（任意）</a>
-        <p class="q-note" id="mail-note" hidden>お使いのメールアプリが開きます。送信するかどうかはご自身で決められます。</p>
         <p class="privacy">星の数の選択と投稿の操作は、必ずご本人が行ってください。投稿は任意であり、投稿しなくても不利益はありません。</p>
         <p class="thanks" id="thanks" hidden>ご協力ありがとうございました。</p>
       </div>
@@ -175,11 +167,11 @@
   <div class="toast" id="toast" role="status"></div>
 
   <footer class="app-footer">
-    <p>入力内容はサーバーに送信・保存されません（試作版）。「控えを送る」を選んだ場合のみ、お使いのメールアプリからご自身の操作で事務所宛てに送信されます。アクセス状況の把握のため、Cookieを使わない計測（GoatCounter）のみ利用しています。</p>
+    <p>入力内容はサーバーに送信・保存されません（試作版）。アクセス状況の把握のため、Cookieを使わない計測（GoatCounter）のみ利用しています。</p>
   </footer>
 
-  <script src="offices.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="offices.js?v=6"></script>
+  <script src="app.js?v=6"></script>
   <script data-goatcounter="https://keiei-tools.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
