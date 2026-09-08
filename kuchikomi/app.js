@@ -526,6 +526,14 @@
     $('btn-mail').hidden = !mailHref;
     $('mail-note').hidden = !mailHref;
     if (mailHref) { $('btn-mail').href = mailHref; }
+    /* 本人が選んだ満足度の再掲（参考表示のみ。星の選択はGoogle画面で本人が行う） */
+    var ratingRef = $('rating-ref');
+    if (state.rating > 0) {
+      ratingRef.textContent = 'ご参考：先ほどお答えいただいた満足度は ★' + state.rating + '（5段階中）でした。Googleでの星は、投稿画面でご自身の判断でお選びください。';
+      ratingRef.hidden = false;
+    } else {
+      ratingRef.hidden = true;
+    }
     show('s-final');
   });
 
