@@ -1,8 +1,10 @@
 /* 口コミ作成アシスタント 試作版
-   - 入力内容はブラウザ内でのみ処理する（送信・保存なし）
+   - 入力内容はブラウザ内でのみ処理する（サーバー送信・保存なし）。
+     「控えを送る」は顧客本人のメールアプリ経由（mailto）でのみ送信される。
    - 文章生成は generateDrafts() に隔離してある。
      本番でLLM APIに差し替える場合はこの関数だけを置き換える。
-   - 原則: 顧客が入力・選択した内容以外の事実を文章に加えない */
+   - 原則: 顧客が入力・選択した内容以外の事実を文章に加えない。
+     満足度（星）の値によって画面の流れを変えない（Googleポリシー対応） */
 (function () {
   'use strict';
 
@@ -44,28 +46,80 @@
     yushi: '融資・資金繰りの相談'
   };
 
+  /* 文体2種 × 各2バリエーション */
   var OPENINGS = {
-    komon: ['顧問税理士としてお世話になっています。', '税務顧問をお願いしています。'],
-    shinkoku: ['確定申告をお願いしました。', '確定申告の際にお世話になりました。'],
-    souzoku: ['相続の件で相談させていただきました。', '相続のことで相談に乗っていただきました。'],
-    setsuritsu: ['会社設立の際にお世話になりました。', '創業のタイミングから相談に乗っていただいています。'],
-    kichou: ['記帳や経理まわりのサポートをお願いしています。', '経理のサポートをお願いしています。'],
-    nencho: ['給与計算や年末調整をお願いしています。', '年末調整などの手続きをお任せしています。'],
-    yushi: ['融資・資金繰りの相談でお世話になりました。', '資金繰りの相談に乗っていただきました。']
+    komon: {
+      formal: ['顧問税理士としてお世話になっています。', '税務顧問をお願いしています。'],
+      soft: ['顧問税理士としていつもお世話になっています。', 'いつも税務顧問でお世話になっています。']
+    },
+    shinkoku: {
+      formal: ['確定申告をお願いしました。', '確定申告の際にお世話になりました。'],
+      soft: ['確定申告でお世話になりました。', '確定申告をお願いしました。']
+    },
+    souzoku: {
+      formal: ['相続の件で相談させていただきました。', '相続のことで相談に乗っていただきました。'],
+      soft: ['相続のことで相談に乗ってもらいました。', '相続の件でお世話になりました。']
+    },
+    setsuritsu: {
+      formal: ['会社設立の際にお世話になりました。', '創業のタイミングから相談に乗っていただいています。'],
+      soft: ['会社設立のときからお世話になっています。', '創業のときに相談に乗ってもらいました。']
+    },
+    kichou: {
+      formal: ['記帳や経理まわりのサポートをお願いしています。', '経理のサポートをお願いしています。'],
+      soft: ['経理まわりをいつも助けてもらっています。', '記帳や経理のサポートをお願いしています。']
+    },
+    nencho: {
+      formal: ['給与計算や年末調整をお願いしています。', '年末調整などの手続きをお任せしています。'],
+      soft: ['給与や年末調整まわりをお任せしています。', '給与計算や年末調整をお願いしています。']
+    },
+    yushi: {
+      formal: ['融資・資金繰りの相談でお世話になりました。', '資金繰りの相談に乗っていただきました。'],
+      soft: ['融資の相談に乗ってもらいました。', '資金繰りの相談でお世話になりました。']
+    }
   };
 
   var CLAUSES = {
-    wakariyasui: ['難しい内容も分かりやすく説明していただけます', '専門的な話も噛み砕いて説明してくれます'],
-    hayai: ['質問への対応がとても早いです', 'レスポンスが早く、安心してやり取りできます'],
-    shinmi: ['こちらの事情に親身に寄り添っていただけます', 'とても親身に対応していただけます'],
-    senmon: ['専門知識が豊富で、安心して任せられます', '知識が豊富で頼りになります'],
-    gyoukai: ['業界の事情にも詳しく、話が早いです', 'こちらの業界に詳しく、相談がスムーズです'],
-    teian: ['提案が具体的で、すぐに行動に移せます', 'アドバイスが具体的で助かります'],
-    igai: ['税務以外のことも気軽に相談できます', '経営の相談まで幅広く乗っていただけます'],
-    anshin: ['長くお付き合いできる安心感があります', '安心して長く任せられる事務所だと思います']
+    wakariyasui: {
+      formal: ['難しい内容も分かりやすく説明していただけます', '専門的な話も噛み砕いて説明してくださいます'],
+      soft: ['難しい話もかみくだいて説明してくれるので、とても分かりやすいです', '説明が分かりやすくて、毎回すっきり理解できます']
+    },
+    hayai: {
+      formal: ['質問への対応が非常に迅速です', 'レスポンスが早く、安心してやり取りできます'],
+      soft: ['連絡するとすぐに対応してくれます', 'レスポンスが早くて助かっています']
+    },
+    shinmi: {
+      formal: ['こちらの事情に親身に寄り添っていただけます', '親身にご対応いただけます'],
+      soft: ['いつも親身になって話を聞いてくれます', 'こちらの事情までしっかり考えてくれて心強いです']
+    },
+    senmon: {
+      formal: ['専門知識が豊富で、安心してお任せできます', '知識が豊富で大変頼りになります'],
+      soft: ['知識が豊富で、何を聞いても頼りになります', '専門的なことも安心して任せられます']
+    },
+    gyoukai: {
+      formal: ['業界の事情にも精通しておられ、話が早いです', 'こちらの業界に詳しく、相談がスムーズです'],
+      soft: ['うちの業界のこともよく分かってくれていて話が早いです', '業界の事情に詳しいので相談しやすいです']
+    },
+    teian: {
+      formal: ['ご提案が具体的で、すぐに実行に移せます', 'アドバイスが具体的で助かります'],
+      soft: ['アドバイスが具体的で、すぐ実行できるのがありがたいです', '提案が具体的で助かっています']
+    },
+    igai: {
+      formal: ['税務以外のことも気軽に相談できます', '経営の相談まで幅広く乗っていただけます'],
+      soft: ['税金以外のことも気軽に相談できるのが助かります', '経営の相談まで幅広く乗ってくれます']
+    },
+    anshin: {
+      formal: ['長くお付き合いできる安心感があります', '安心して長くお任せできる事務所だと思います'],
+      soft: ['これからも長くお付き合いしたいと思える事務所です', '安心してずっとお任せできます']
+    }
   };
 
-  var CLOSINGS = ['お願いしてよかったです。', 'これからもお世話になりたいと思います。'];
+  var CLOSINGS = {
+    formal: ['お願いしてよかったです。', 'これからもお世話になりたいと思います。'],
+    soft: ['本当にお願いしてよかったです。', 'いつもありがとうございます。これからもよろしくお願いします。']
+  };
+
+  var TONES = ['soft', 'formal'];
+  var STYLES = ['simple', 'standard', 'detail'];
 
   /* ---------- 状態 ---------- */
 
@@ -78,7 +132,9 @@
     q3: '',
     q4: '',
     q5: '',
+    rating: 0,
     drafts: null,
+    currentTone: 'formal',
     currentStyle: 'standard',
     finalText: ''
   };
@@ -139,9 +195,7 @@
 
   /* ---------- 文章生成（本番ではここをLLM APIに差し替える） ---------- */
 
-  function generateDrafts() {
-    var seed = answerHash();
-
+  function buildDraftSet(tone, seed) {
     /* 書き出し（複数サービス選択に対応） */
     var nouns = [];
     state.q1.forEach(function (key) {
@@ -165,27 +219,37 @@
 
     if (state.q1.length === 1 && state.q1[0] === 'other') {
       var single = state.q1Other.trim();
-      opening = single ? single + 'の件でお世話になりました。' : 'いろいろと相談に乗っていただいています。';
+      if (single) {
+        opening = tone === 'soft'
+          ? single + 'の件で相談に乗ってもらいました。'
+          : single + 'の件でお世話になりました。';
+      } else {
+        opening = 'いろいろと相談に乗っていただいています。';
+      }
     } else if (state.q1.length === 1) {
-      opening = pick(OPENINGS[state.q1[0]], seed);
+      opening = pick(OPENINGS[state.q1[0]][tone], seed);
     } else if (hasKomon && othersNouns.length > 0) {
-      opening = '顧問税理士としてお世話になっており、' + joinNouns(othersNouns) + 'もお願いしています。';
+      opening = tone === 'soft'
+        ? '顧問税理士としていつもお世話になっていて、' + joinNouns(othersNouns) + 'もお願いしています。'
+        : '顧問税理士としてお世話になっており、' + joinNouns(othersNouns) + 'もお願いしています。';
     } else if (hasKomon) {
-      opening = pick(OPENINGS.komon, seed);
+      opening = pick(OPENINGS.komon[tone], seed);
     } else if (nouns.length > 0) {
-      opening = joinNouns(nouns) + 'でお世話になっています。';
+      opening = tone === 'soft'
+        ? joinNouns(nouns) + 'でいつもお世話になっています。'
+        : joinNouns(nouns) + 'でお世話になっています。';
     } else {
       opening = 'いろいろと相談に乗っていただいています。';
     }
 
-    /* 印象に残った点 → 文のリスト（選択順を保ちつつ、顧客ごとに言い回しを変える） */
+    /* 印象に残った点 → 文のリスト */
     var clauses = [];
     state.q2.forEach(function (key, i) {
       if (key === 'other') {
         var o = ensurePeriod(state.q2Other);
         if (o) { clauses.push(o); }
       } else {
-        clauses.push(pick(CLAUSES[key], seed + i) + '。');
+        clauses.push(pick(CLAUSES[key][tone], seed + i) + '。');
       }
     });
 
@@ -199,17 +263,14 @@
         : q4 + 'にもおすすめできると思います。';
     }
 
-    var closing = pick(CLOSINGS, seed + 7);
+    var closing = pick(CLOSINGS[tone], seed + 7);
 
-    /* シンプル: 書き出し＋印象1〜2点＋締め */
     var simple = opening + clauses.slice(0, 2).join('') + closing;
 
-    /* 標準: 書き出し＋印象2〜3点＋おすすめ＋締め */
     var standard = opening + clauses.slice(0, 3).join('');
     if (recommend) { standard += recommend; }
     standard += closing;
 
-    /* 詳細: 書き出し＋印象＋エピソード＋おすすめ＋締め */
     var detailParts = [opening + clauses.slice(0, 4).join('')];
     if (episode) { detailParts.push(episode); }
     var tail = '';
@@ -219,6 +280,14 @@
     var detail = detailParts.join('\n\n');
 
     return { simple: simple, standard: standard, detail: detail };
+  }
+
+  function generateDrafts() {
+    var seed = answerHash();
+    return {
+      soft: buildDraftSet('soft', seed),
+      formal: buildDraftSet('formal', seed)
+    };
   }
 
   /* ---------- チップ描画 ---------- */
@@ -245,6 +314,37 @@
       var on = selected.indexOf(b.dataset.key) !== -1;
       b.classList.toggle('on', on);
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- 星（満足度・任意） ---------- */
+
+  function renderStars() {
+    var box = $('stars');
+    box.textContent = '';
+    for (var i = 1; i <= 5; i++) {
+      (function (value) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'star';
+        b.setAttribute('role', 'radio');
+        b.setAttribute('aria-label', value + '（5段階中）');
+        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6 0.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-0.9z"/></svg>';
+        b.addEventListener('click', function () {
+          state.rating = (state.rating === value) ? 0 : value;
+          updateStars();
+        });
+        box.appendChild(b);
+      })(i);
+    }
+    updateStars();
+  }
+
+  function updateStars() {
+    Array.from($('stars').children).forEach(function (b, i) {
+      var on = (i + 1) <= state.rating;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', (i + 1) === state.rating ? 'true' : 'false');
     });
   }
 
@@ -289,18 +389,56 @@
     show('s-generating');
     setTimeout(function () {
       state.drafts = generateDrafts();
-      selectStyle('standard');
+      updateDraftView();
       show('s-drafts');
       track('kuchikomi-drafts');
     }, 700);
   }
 
-  function selectStyle(style) {
-    state.currentStyle = style;
-    Array.from($('draft-tabs').children).forEach(function (t) {
-      t.classList.toggle('on', t.dataset.style === style);
+  function updateDraftView() {
+    Array.from($('tone-tabs').children).forEach(function (t) {
+      t.classList.toggle('on', t.dataset.tone === state.currentTone);
     });
-    $('draft-preview').textContent = state.drafts[style];
+    Array.from($('draft-tabs').children).forEach(function (t) {
+      t.classList.toggle('on', t.dataset.style === state.currentStyle);
+    });
+    $('draft-preview').textContent = state.drafts[state.currentTone][state.currentStyle];
+  }
+
+  /* ---------- メール控え（顧客本人がメールアプリから送る） ---------- */
+
+  function labelsFor(options, keys, otherText) {
+    var labels = [];
+    keys.forEach(function (k) {
+      if (k === 'other') {
+        labels.push(otherText.trim() ? 'その他（' + otherText.trim() + '）' : 'その他');
+      } else {
+        var opt = options.filter(function (o) { return o.key === k; })[0];
+        if (opt) { labels.push(opt.label); }
+      }
+    });
+    return labels.join('、');
+  }
+
+  function buildMailHref() {
+    var office = state.office;
+    if (!office.email) { return ''; }
+    var lines = [
+      '【口コミ作成アシスタント 回答控え】',
+      '事務所: ' + office.name,
+      '利用サービス: ' + (labelsFor(Q1_OPTIONS, state.q1, state.q1Other) || '（未回答）'),
+      '印象に残った点: ' + (labelsFor(Q2_OPTIONS, state.q2, state.q2Other) || '（未回答）'),
+      '印象に残った出来事: ' + (state.q3.trim() || '（記入なし）'),
+      'おすすめしたい人: ' + (state.q4.trim() || '（記入なし）'),
+      '改善してほしい点: ' + (state.q5.trim() || '（記入なし）'),
+      '全体の満足度: ' + (state.rating > 0 ? '★' + state.rating + '（5段階中）' : '（未選択）'),
+      '',
+      '--- 作成した口コミ文 ---',
+      state.finalText
+    ];
+    return 'mailto:' + office.email +
+      '?subject=' + encodeURIComponent('口コミ作成アシスタント 回答控え（' + office.name + '）') +
+      '&body=' + encodeURIComponent(lines.join('\n'));
   }
 
   /* ---------- 初期化 ---------- */
@@ -329,12 +467,14 @@
   renderChips('q2-chips', Q2_OPTIONS, true, function () {
     return state.q2;
   }, function (key) {
-    var idx = state.q2.indexOf(key);
-    if (idx === -1) { state.q2.push(key); } else { state.q2.splice(idx, 1); }
+    var idx2 = state.q2.indexOf(key);
+    if (idx2 === -1) { state.q2.push(key); } else { state.q2.splice(idx2, 1); }
     $('q2-other-wrap').hidden = (state.q2.indexOf('other') === -1);
     $('q2-error').hidden = true;
     updateChips('q2-chips', function () { return state.q2; });
   });
+
+  renderStars();
 
   $('btn-start').addEventListener('click', function () {
     track('kuchikomi-start');
@@ -350,14 +490,24 @@
     if (qIndex === QUESTIONS.length - 1) { toDrafts(); } else { showQuestion(qIndex + 1); }
   });
 
+  Array.from($('tone-tabs').children).forEach(function (t) {
+    t.addEventListener('click', function () {
+      state.currentTone = t.dataset.tone;
+      updateDraftView();
+    });
+  });
+
   Array.from($('draft-tabs').children).forEach(function (t) {
-    t.addEventListener('click', function () { selectStyle(t.dataset.style); });
+    t.addEventListener('click', function () {
+      state.currentStyle = t.dataset.style;
+      updateDraftView();
+    });
   });
 
   $('btn-drafts-back').addEventListener('click', function () { showQuestion(QUESTIONS.length - 1); });
 
   $('btn-choose').addEventListener('click', function () {
-    $('edit-text').value = state.drafts[state.currentStyle];
+    $('edit-text').value = state.drafts[state.currentTone][state.currentStyle];
     show('s-edit');
   });
 
@@ -372,6 +522,10 @@
     state.finalText = text;
     $('final-text').textContent = text;
     $('google-note').hidden = !!state.office.reviewUrl;
+    var mailHref = buildMailHref();
+    $('btn-mail').hidden = !mailHref;
+    $('mail-note').hidden = !mailHref;
+    if (mailHref) { $('btn-mail').href = mailHref; }
     show('s-final');
   });
 

@@ -6,6 +6,7 @@
 window.OFFICES = {
   'demo': {
     name: 'サンプル税理士事務所',
-    reviewUrl: ''
+    reviewUrl: '',
+    email: 'masashi@stgate.co.jp'
   }
 };
