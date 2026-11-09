@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>問い合わせ対応アシスタント（試作版）</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <main class="app">
+
+    <!-- 導入 -->
+    <section id="s-intro" class="screen" hidden>
+      <div class="card">
+        <div class="emblem" aria-hidden="true">
+          <svg viewBox="0 0 76 76" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="38" cy="38" r="36" fill="none" stroke="#1c3a5b" stroke-width="1.5"/>
+            <circle cx="38" cy="38" r="30" fill="none" stroke="#a8854a" stroke-width="1"/>
+            <path d="M20 29 h36 v22 h-36 Z" fill="none" stroke="#1c3a5b" stroke-width="1.6"/>
+            <path d="M20 29 L38 42 L56 29" fill="none" stroke="#1c3a5b" stroke-width="1.6"/>
+            <circle cx="38" cy="34" r="0" fill="#a8854a"/>
+          </svg>
+        </div>
+        <p class="office-label">税理士・会計事務所向け 試作デモ</p>
+        <h1>届いた問い合わせを、<br>その場で「返信できる形」に</h1>
+        <p>紹介会社やホームページから届く新規のお問い合わせを、事務所の<strong>受任基準</strong>と照らし合わせて整理し、確認すべき点と<strong>返信文のたたき台</strong>までご用意します。</p>
+        <ul class="intro-points">
+          <li>手順は3つ：基準の設定 → 問い合わせの取り込み → 結果の確認</li>
+          <li>返信文は自由に修正して使えます</li>
+          <li>入力内容はサーバーに送信・保存されません</li>
+        </ul>
+        <button class="btn btn-primary btn-block" id="btn-start" type="button">はじめる</button>
+        <p class="privacy">本番版では、メールで届いた問い合わせ文をAIが自動で読み取る構想です。この試作版では読み取りを模擬しており、AIは使用していません。すべての処理はお使いのブラウザ内で完結します。</p>
+      </div>
+    </section>
+
+    <!-- 手順1: 受任基準 -->
+    <section id="s-criteria" class="screen" hidden>
+      <div class="card">
+        <div class="progress"><div class="progress-bar" style="width: 33%"></div></div>
+        <p class="step-label">手順 1 / 3　受任基準の設定</p>
+        <h2>事務所の受任基準を教えてください</h2>
+        <p class="q-note">新しい問い合わせを受けるかどうかの、事務所としてのめやすです。あとから何度でも変えられます。</p>
+
+        <p class="group-label">対応したい業種（複数選べます）</p>
+        <div class="chips" id="c-industry"></div>
+        <p class="q-error" id="c-industry-error" hidden>1つ以上選んでください。</p>
+
+        <p class="group-label">月額顧問料のめやす（下限）</p>
+        <div class="chips" id="c-fee"></div>
+
+        <p class="group-label">記帳代行</p>
+        <div class="chips" id="c-kicho"></div>
+
+        <p class="group-label">対応エリア</p>
+        <div class="chips" id="c-area"></div>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-criteria-back" type="button">戻る</button>
+          <button class="btn btn-primary" id="btn-criteria-next" type="button">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 手順2: 問い合わせの取り込み -->
+    <section id="s-inquiry" class="screen" hidden>
+      <div class="card">
+        <div class="progress"><div class="progress-bar" style="width: 66%"></div></div>
+        <p class="step-label">手順 2 / 3　問い合わせの取り込み</p>
+        <h2>届いた問い合わせを選んでください</h2>
+        <p class="q-note">試作版のため、サンプルのお問い合わせメールを3通ご用意しました。実際の問い合わせを想定して、どれか1通を選んでください。</p>
+        <div class="tabs" id="sample-tabs">
+          <button class="tab" data-sample="a" type="button">サンプルA</button>
+          <button class="tab" data-sample="b" type="button">サンプルB</button>
+          <button class="tab" data-sample="c" type="button">サンプルC</button>
+        </div>
+        <div class="mail-box" id="mail-box"></div>
+        <button class="btn btn-primary btn-block" id="btn-import" type="button">このメールを取り込む</button>
+        <button class="btn btn-ghost btn-block" id="btn-manual" type="button">サンプルを使わず、内容を自分で入力する</button>
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-inquiry-back" type="button">戻る</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 処理中 -->
+    <section id="s-generating" class="screen" hidden>
+      <div class="card center">
+        <div class="spinner" aria-hidden="true"></div>
+        <p id="generating-text">メールの内容を読み取っています…</p>
+      </div>
+    </section>
+
+    <!-- 手順2b: 読み取り内容の確認・入力 -->
+    <section id="s-fields" class="screen" hidden>
+      <div class="card">
+        <div class="progress"><div class="progress-bar" style="width: 66%"></div></div>
+        <p class="step-label">手順 2 / 3　内容の確認</p>
+        <h2 id="fields-title">読み取った内容をご確認ください</h2>
+        <p class="q-note" id="fields-note">本番版では、ここまでをAIが自動で入力する想定です。違っている箇所があれば直してください。</p>
+
+        <p class="group-label">業種</p>
+        <div class="chips" id="i-industry"></div>
+        <p class="q-error" id="i-industry-error" hidden>1つ選んでください。</p>
+
+        <p class="group-label">希望されている内容（複数選べます）</p>
+        <div class="chips" id="i-services"></div>
+        <p class="q-error" id="i-services-error" hidden>1つ以上選んでください。</p>
+
+        <p class="group-label">希望予算（月額）</p>
+        <div class="chips" id="i-budget"></div>
+        <p class="q-error" id="i-budget-error" hidden>1つ選んでください。</p>
+
+        <p class="group-label">所在地</p>
+        <div class="chips" id="i-location"></div>
+        <p class="q-error" id="i-location-error" hidden>1つ選んでください。</p>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-fields-back" type="button">戻る</button>
+          <button class="btn btn-primary" id="btn-analyze" type="button">受任基準と照合する</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 手順3: 結果 -->
+    <section id="s-result" class="screen" hidden>
+      <div class="card">
+        <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+        <p class="step-label">手順 3 / 3　照合結果</p>
+        <h2>受任基準と照合しました</h2>
+        <p class="result-summary" id="result-summary"></p>
+        <div class="check-list" id="check-list"></div>
+
+        <h2 class="result-h">面談・返信の前に確認したいこと</h2>
+        <ul class="intro-points" id="confirm-list"></ul>
+
+        <h2 class="result-h">返信文のたたき台</h2>
+        <p class="q-note" id="reply-note"></p>
+        <div class="tabs" id="reply-tabs">
+          <button class="tab" data-reply="meet" type="button">面談をご案内</button>
+          <button class="tab" data-reply="ask" type="button">追加で確認</button>
+          <button class="tab" data-reply="decline" type="button">今回は見送り</button>
+        </div>
+        <textarea id="reply-text" rows="14"></textarea>
+        <button class="btn btn-primary btn-block" id="btn-copy" type="button">返信文をコピーする</button>
+        <p class="privacy">返信文はあくまでたたき台です。事務所のお名前や日時などの「◯◯」部分を埋め、内容をご確認のうえでお使いください。受任するかどうかの最終判断はご自身で行ってください。</p>
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="btn-result-back" type="button">内容を直す</button>
+          <button class="btn btn-ghost" id="btn-restart" type="button">別の問い合わせを試す</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <footer class="app-footer">
+    <p>入力内容はサーバーに送信・保存されません（試作版）。アクセス状況の把握のため、Cookieを使わない計測（GoatCounter）のみ利用しています。</p>
+    <p><a href="../">経営tools トップへ戻る</a></p>
+  </footer>
+
+  <script src="app.js?v=2"></script>
+  <script data-goatcounter="https://keiei-tools.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
